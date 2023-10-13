@@ -14,18 +14,21 @@ def matrix_multiplication(m_1: np.ndarray, m_2: np.ndarray)-> np.ndarray:
     Returns:
         La matriz resultante del procedimineto de la multiplicación
     """
-    if m_1 == None or m_2 == None:
+    if m_1 is None or m_2 is None:
         return np.array([])
     
-    dim1 = np.shape(m_1)
-    dim2 = np.shape(m_2)
-    if dim1[1] != dim2[0]:
+    # Obtenemos las dimensiones de las matrices y miramos que sean compatibles
+    rows_m1, columns_m1 = np.shape(m_1)
+    rows_m2, columns_m2 = np.shape(m_2)
+    if columns_m1 != rows_m2:
         return np.array([])
-    res = np.empty((dim1[0], dim2[1]))
-    for i in range(dim1[0]):
-        for j in range(dim2[1]):
+    
+    # Creamos una array vacia y vamos metiendo el resultado de las multiplicaciones
+    res = np.empty((rows_m1, columns_m2))
+    for i in range(rows_m1):
+        for j in range(columns_m2):
             res[i][j] = 0
-            for k in range(dim2[1]):
+            for k in range(columns_m1):
                 res[i][j] += m_1[i][k] * m_2[k][j]
     return res
 
@@ -39,22 +42,29 @@ def bb(t: list, f: int, l: int, key: int)-> int:
         l: índice del último elemento de la lista t
         key: elemento que queremos encontrar
 
-        
     Returns:
         Si es que hemos encontrado el elemento que buscábamos devolvemos
         el índice de la lista en el que se encuentra el elemento que buscamos(key).
         En caso contrario se devuelve none.
     """
-    if t == None or f < 0 or l < 0:
+    if (t is None) or (len(t) == 0) or (f < 0) or (l < 0) or (l > len(t)-1):
         return None
     while l >= f:
         mid = int((l + f) / 2)
+
+        # Si el elemento es el del medio, devolvemos su indice
         if t[mid] == key:
             return mid
+        
+        # Si el elemento es menor, miramos en la sublista de la derecha
         elif t[mid] < key:
             f = mid + 1
+
+        # Si el elemento es mayor, miramos en la sublista de la izquierda
         else:
             l = mid - 1
+
+    # Si se sale del bucle, no se ha encontardo el elemento
     return None
 
 def rec_bb(t: list, f: int, l: int, key: int)-> int:
@@ -67,26 +77,29 @@ def rec_bb(t: list, f: int, l: int, key: int)-> int:
         l: índice del último elemento de la lista t
         key: elemento que queremos encontrar
 
-        
     Returns:
         Si es que hemos encontrado el elemento que buscábamos devolvemos
         el índice de la lista en el que se encuentra el elemento que buscamos(key).
         En caso contrario se devuelve none.
     """
-    if t == None or f < 0 or l < 0:
+    if (t is None) or (len(t) == 0) or (f < 0) or (l < 0) or (l > len(t)-1):
         return None
     
     mid = int((l + f) / 2)
     
+    # Si el elemento es el del medio, devolvemos su indice
     if t[mid] == key:
         return mid
     
+    # Si el limite superior es menor al inferior, no se ha encontrado el elemento
     if l <= f:
         return None
 
+    # Si el elemento es menor, miramos en la sublista de la derecha
     elif t[mid] < key:
         return rec_bb(t, mid + 1, l, key)
     
+    # Si el elemento es mayor, miramos en la sublista de la izquierda
     else:
         return rec_bb(t, f, mid - 1, key)
 
@@ -101,7 +114,7 @@ def min_heapify(h: np.ndarray, i: int):
     Returns:
         La array con el procedimiento aplicado
     """
-    if h == None or i < 0:
+    if h is None or i < 0:
         return 
 
     flag = True  
@@ -110,10 +123,15 @@ def min_heapify(h: np.ndarray, i: int):
         left = 2*i+1
         right = 2*i+2
         
+        # Si el hijo izquierdo es menor al padre, se intercambian
         if left < len(h) and h[i] > h[left]:
             head = left
+
+        # Si el hijo derecho es menor al padre, se intercambian
         if right < len(h) and h[right] < h[head]:
             head = right
+        
+        # Si quedan elementos por observar, sigue el bucle
         if  head != i:
             h[i], h[head] = h[head], h[i]
             i = head
@@ -132,14 +150,14 @@ def insert_min_heap(h: np.ndarray, k: int)-> np.ndarray:
     Returns:
         La array con el elemento añadido
     """
-    if h == None or k < 0:
+    if h is None:
         return None
 
+    # Añadimos el elemento
     h = np.array(list(h) + [k])
-    index = len(h) - 1
-    while index >= 1 and h[(index - 1) // 2] > h[index]:
-        h[(index - 1) // 2], h[index] = h[index], h[(index - 1) // 2]
-        index = (index - 1) // 2
+
+    # Aplicamos heapify desde este último nodo para que se cumplan las relacioens
+    min_heapify(h, len(h) - 1)
 
     return h
 
@@ -154,11 +172,12 @@ def create_min_heap(h: np.ndarray):
     Returns:
         None
     """
-    if h == None:
-        return
-
+    if h is None:
+        return 
+    
     index = (len(h) - 2) // 2
 
+    # Vamos mirando todos los nodos, viendo que se cumpla la relacion padre < hijo
     while index >= 0:
         min_heapify(h, index)
         index -= 1
@@ -189,8 +208,8 @@ def pq_insert(h: np.ndarray, k: int)-> np.ndarray:
     Returns:
         La cola de prioridad con el elemento k ya insertado
     """
-    if h == None:
-            return None
+    if h is None:
+        return np.array([])
     return insert_min_heap(h, k)
 
 def pq_remove(h: np.ndarray)-> Tuple[int, np.ndarray]:
@@ -207,7 +226,7 @@ def pq_remove(h: np.ndarray)-> Tuple[int, np.ndarray]:
         cuyo segundo elemento es la cola de prioridad con el 
         elemento ya extraido
     """
-    if h == None or len(h) == 0:
+    if h is None or len(h) == 0:
         return(-1, pq_ini())
     
     # Extraemos elemento
@@ -232,11 +251,17 @@ def min_heap_sort(h: np.ndarray)-> np.ndarray:
     Returns:
         La array con el procedimiento ejecutado
     """
-    if h == None:
-            return None
+    if h is None:
+        return np.array([])
+    
+    # Creamos la array donde vamos a copiar todos los elementos
     result = np.array([])
 
+    # Ordenamos los elementos de la array 'h'
     create_min_heap(h)
+
+    # Extraemos la cabeza del heap en cada iteracion, que es el elemento más pequeño, y
+    # lo añadimos a la creada anteriormente
     while len(h) > 0:
         node, h = pq_remove(h)
         result = np.array(list(result) + [node])
