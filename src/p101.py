@@ -272,7 +272,7 @@ def min_heap_sort(h: np.ndarray) -> np.ndarray:
         return np.array([])
 
     # Creamos la array donde vamos a copiar todos los elementos
-    result = np.array([])
+    result = pq_ini()
 
     # Ordenamos los elementos de la array 'h'
     create_min_heap(h)
